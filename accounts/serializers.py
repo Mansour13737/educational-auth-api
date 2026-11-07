@@ -19,3 +19,8 @@ class RegisterSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         validated_data.pop("password_confirm")
         return User.objects.create_user(**validated_data)
+class ProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ("id", "email", "first_name", "last_name", "date_joined")
+        read_only_fields = ("id", "email", "date_joined")
