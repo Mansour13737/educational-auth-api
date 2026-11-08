@@ -62,3 +62,38 @@ def test_register_password_not_in_response(api_client):
     body = response.json()
     assert "password" not in body
     assert "password_confirm" not in body
+    
+@pytest.mark.django_db
+def test_register_rejects_numeric_password(api_client):
+    payload = {
+        "email": "numeric@example.com",
+        "password": "12345678",
+        "password_confirm": "12345678",
+    }
+    response = api_client.post("/api/auth/register/", payload, format="json")
+    assert response.status_code == 400
+    assert "password" in response.json()
+
+
+@pytest.mark.django_db
+def test_register_rejects_common_password(api_client):
+    payload = {
+        "email": "common@example.com",
+        "password": "password123",
+        "password_confirm": "password123",
+    }
+    response = api_client.post("/api/auth/register/", payload, format="json")
+    assert response.status_code == 400
+    assert "password" in response.json()
+
+
+@pytest.mark.django_db
+def test_register_rejects_password_too_similar_to_email(api_client):
+    payload = {
+        "email": "alice@example.com",
+        "password": "aliceexample",
+        "password_confirm": "aliceexample",
+    }
+    response = api_client.post("/api/auth/register/", payload, format="json")
+    assert response.status_code == 400
+    assert "password" in response.json()
