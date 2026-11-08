@@ -1,0 +1,143 @@
+{
+  "info": {
+    "name": "Educational Auth API",
+    "description": "Authentication and User Profile API. Import this file in Postman, run '2. Login' first to populate tokens, then all protected requests work automatically.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {"key": "base_url", "value": "http://127.0.0.1:8000"},
+    {"key": "access_token", "value": ""},
+    {"key": "refresh_token", "value": ""}
+  ],
+  "item": [
+    {
+      "name": "1. Register",
+      "request": {
+        "method": "POST",
+        "header": [{"key": "Content-Type", "value": "application/json"}],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"demo@example.com\",\n  \"first_name\": \"Demo\",\n  \"last_name\": \"User\",\n  \"password\": \"DemoPass123\",\n  \"password_confirm\": \"DemoPass123\"\n}",
+          "options": {"raw": {"language": "json"}}
+        },
+        "url": {"raw": "{{base_url}}/api/auth/register/"}
+      }
+    },
+    {
+      "name": "2. Login",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "if (pm.response.code === 200) {",
+              "  const body = pm.response.json();",
+              "  pm.collectionVariables.set('access_token', body.access);",
+              "  pm.collectionVariables.set('refresh_token', body.refresh);",
+              "  console.log('Tokens saved');",
+              "}"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [{"key": "Content-Type", "value": "application/json"}],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"demo@example.com\",\n  \"password\": \"DemoPass123\"\n}",
+          "options": {"raw": {"language": "json"}}
+        },
+        "url": {"raw": "{{base_url}}/api/auth/login/"}
+      }
+    },
+    {
+      "name": "3. Refresh",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "if (pm.response.code === 200) {",
+              "  const body = pm.response.json();",
+              "  pm.collectionVariables.set('access_token', body.access);",
+              "  if (body.refresh) pm.collectionVariables.set('refresh_token', body.refresh);",
+              "  console.log('Tokens refreshed');",
+              "}"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [{"key": "Content-Type", "value": "application/json"}],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"refresh\": \"{{refresh_token}}\"\n}",
+          "options": {"raw": {"language": "json"}}
+        },
+        "url": {"raw": "{{base_url}}/api/auth/refresh/"}
+      }
+    },
+    {
+      "name": "4. Get Profile",
+      "request": {
+        "method": "GET",
+        "auth": {
+          "type": "bearer",
+          "bearer": [{"key": "token", "value": "{{access_token}}"}]
+        },
+        "url": {"raw": "{{base_url}}/api/profile/"}
+      }
+    },
+    {
+      "name": "5. Update Profile",
+      "request": {
+        "method": "PATCH",
+        "header": [{"key": "Content-Type", "value": "application/json"}],
+        "auth": {
+          "type": "bearer",
+          "bearer": [{"key": "token", "value": "{{access_token}}"}]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"first_name\": \"UpdatedFirst\",\n  \"last_name\": \"UpdatedLast\"\n}",
+          "options": {"raw": {"language": "json"}}
+        },
+        "url": {"raw": "{{base_url}}/api/profile/"}
+      }
+    },
+    {
+      "name": "6. Change Password",
+      "request": {
+        "method": "POST",
+        "header": [{"key": "Content-Type", "value": "application/json"}],
+        "auth": {
+          "type": "bearer",
+          "bearer": [{"key": "token", "value": "{{access_token}}"}]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"old_password\": \"DemoPass123\",\n  \"new_password\": \"NewDemoPass456\",\n  \"new_password_confirm\": \"NewDemoPass456\"\n}",
+          "options": {"raw": {"language": "json"}}
+        },
+        "url": {"raw": "{{base_url}}/api/auth/change-password/"}
+      }
+    },
+    {
+      "name": "7. Logout",
+      "request": {
+        "method": "POST",
+        "header": [{"key": "Content-Type", "value": "application/json"}],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"refresh\": \"{{refresh_token}}\"\n}",
+          "options": {"raw": {"language": "json"}}
+        },
+        "url": {"raw": "{{base_url}}/api/auth/logout/"}
+      }
+    }
+  ]
+}
