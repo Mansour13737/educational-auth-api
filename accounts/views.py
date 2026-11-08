@@ -1,3 +1,4 @@
+from drf_spectacular.utils import OpenApiResponse, extend_schema
 from rest_framework import status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
@@ -9,6 +10,13 @@ from .serializers import ChangePasswordSerializer, ProfileSerializer, RegisterSe
 class RegisterView(APIView):
     permission_classes = [AllowAny]
 
+    @extend_schema(
+        request=RegisterSerializer,
+        responses={
+            201: OpenApiResponse(description="User registered successfully."),
+            400: OpenApiResponse(description="Validation error."),
+        },
+    )
     def post(self, request):
         serializer = RegisterSerializer(data=request.data)
         if serializer.is_valid():
@@ -22,24 +30,32 @@ class RegisterView(APIView):
                 status=status.HTTP_201_CREATED,
             )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+
+
 class ProfileView(APIView):
     permission_classes = [IsAuthenticated]
 
+    @extend_schema(responses=ProfileSerializer)
     def get(self, request):
         serializer = ProfileSerializer(request.user)
         return Response(serializer.data)
 
+    @extend_schema(request=ProfileSerializer, responses=ProfileSerializer)
     def patch(self, request):
         serializer = ProfileSerializer(request.user, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+
+
 class ChangePasswordView(APIView):
     permission_classes = [IsAuthenticated]
 
+    @extend_schema(
+        request=ChangePasswordSerializer,
+        responses={200: OpenApiResponse(description="Password changed successfully.")},
+    )
     def post(self, request):
         serializer = ChangePasswordSerializer(
             data=request.data,
