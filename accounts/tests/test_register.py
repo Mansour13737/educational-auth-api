@@ -62,7 +62,7 @@ def test_register_password_not_in_response(api_client):
     body = response.json()
     assert "password" not in body
     assert "password_confirm" not in body
-    
+
 @pytest.mark.django_db
 def test_register_rejects_numeric_password(api_client):
     payload = {

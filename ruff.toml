@@ -1,0 +1,17 @@
+# Ruff configuration — https://docs.astral.sh/ruff/
+
+line-length = 100
+target-version = "py313"
+
+exclude = [
+    ".venv",
+    "**/migrations/*",
+]
+
+[lint]
+select = ["E", "F", "I", "W"]
+ignore = [
+    # RUF012 clashes with Django/DRF conventions
+    # (permission_classes = [...], REQUIRED_FIELDS = [])
+    "RUF012",
+]
