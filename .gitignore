@@ -26,3 +26,6 @@ Thumbs.db
 
 # Temporary verification scripts
 check_tables.py
+
+# pytest
+.pytest_cache/
